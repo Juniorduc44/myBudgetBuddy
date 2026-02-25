@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Budget Buddy</title>
+
+  <!-- Import map for ES modules -->
+  <script type="importmap">
+  {
+    "imports": {
+      "chart.js": "https://esm.sh/chart.js@4.4.0",
+      "dayjs": "https://esm.sh/dayjs@1.11.9"
+    }
+  }
+  </script>
+
+  <style>
+    :root{
+      --bg:#fbfbfb;
+      --card:#ffffff;
+      --muted:#666;
+      --accent:#107B59;
+      --danger:#D9534F;
+      --green:#2EBD85;
+      font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body,#app{height:100%}
+    body{
+      background:var(--bg);
+      color:#111;
+      -webkit-user-select:none;
+      user-select:none;
+      font-size:15px;
+      padding:14px;
+    }
+
+    #app{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    /* Top bar */
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .top-actions button{
+      padding:8px 10px;
+      border-radius:10px;
+      border:0;
+      background:#e7f3ee;
+      color:var(--accent);
+      font-size:13px;
+      font-weight:500;
+      white-space:nowrap;
+    }
+    #share-btn{
+      background:#f3efe2;
+      color:#b38722;
+    }
+
+    .balance{
+      background:var(--card);
+      padding:10px 14px;
+      border-radius:12px;
+      box-shadow:0 6px 16px rgba(16,27,39,0.06);
+      min-width:0;
+      flex:1;
+    }
+    .balance .label{font-size:12px;color:var(--muted)}
+    #balance-amount{font-size:20px;font-weight:600;margin-top:6px}
+
+    /* Add button */
+    #add-btn{
+      width:56px;height:56px;border-radius:14px;border:0;background:linear-gradient(180deg,var(--accent),#0f6f50);
+      color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 20px rgba(16,123,89,0.18);
+      flex-shrink:0;
+    }
+
+    /* Main area */
+    .main{
+      background:transparent;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      flex:1;
+      overflow:hidden;
+    }
+
+    .chart-wrap{
+      background:var(--card);
+      padding:10px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:170px;
+      box-shadow:0 6px 16px rgba(16,27,39,0.06);
+    }
+
+    .summary{
+      display:flex;
+      gap:10px;
+    }
+    .summary-item{
+      background:var(--card);
+      padding:10px 12px;
+      border-radius:10px;
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 6px 16px rgba(16,27,39,0.04);
+    }
+    .green{color:var(--green);font-weight:600}
+    .red{color:var(--danger);font-weight:600}
+
+    /* Transactions list */
+    .transactions{
+      background:var(--card);
+      padding:10px;
+      border-radius:12px;
+      flex:1;
+      overflow:auto;
+      box-shadow:0 8px 24px rgba(16,27,39,0.06);
+    }
+    .tx{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 8px;border-radius:10px;
+    }
+    .tx + .tx{margin-top:6px}
+    .tx .left{display:flex;gap:10px;align-items:center}
+    .dot{
+      width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;
+    }
+    .dot.income{background:linear-gradient(180deg,#2EBD85,#1F9A70)}
+    .dot.expense{background:linear-gradient(180deg,#FF8A66,#D9534F)}
+    .tx .meta{display:flex;flex-direction:column}
+    .tx .meta .cat{font-weight:600}
+    .tx .meta .note{font-size:12px;color:var(--muted)}
+    .tx .amt{font-weight:700}
+
+    /* Sheet modal */
+    .sheet{
+      position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;
+      background:linear-gradient(rgba(0,0,0,0.14),rgba(0,0,0,0.14));
+      visibility:hidden;opacity:0;transition:opacity .18s, visibility .18s;
+    }
+    .sheet[aria-hidden="false"]{visibility:visible;opacity:1}
+    .sheet-card{
+      width:100%;
+      max-width:540px;
+      background:var(--card);
+      border-radius:16px 16px 0 0;
+      padding:14px;
+      box-shadow:0 -8px 36px rgba(8,17,29,0.12);
+    }
+    .sheet-header{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+    }
+    .sheet-header #sheet-title{font-weight:700}
+    .row{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+    .row label{font-size:12px;color:var(--muted)}
+    .row input, .row select{
+      padding:10px;border-radius:10px;border:1px solid #eee;font-size:15px;background:#fff;
+    }
+    .segmented{display:flex;border-radius:10px;overflow:hidden;border:1px solid #eee}
+    .segmented .seg{flex:1;padding:8px 10px;background:transparent;border:0}
+    .segmented .seg.active{background:linear-gradient(180deg,#f0fff8,#f5fff9)}
+    .actions{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
+    button.primary{flex:1;background:var(--accent);color:#fff;padding:10px;border-radius:10px;border:0}
+    button.danger{flex:1;background:transparent;color:var(--danger);border:1px solid #ffdddd;border-radius:10px;padding:10px}
+
+    /* Share helper toast */
+    #share-toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.86);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:10px;
+      font-size:12px;
+      max-width:90%;
+      text-align:center;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s;
+      z-index:40;
+    }
+    #share-toast.visible{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    /* small screens adapt */
+    @media (max-width:420px){
+      body{padding:10px}
+      .sheet-card{padding:12px}
+      #add-btn{width:52px;height:52px}
+      .top{align-items:flex-start}
+      .top-actions{flex-direction:column;align-items:flex-end}
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="top">
+      <div class="balance">
+        <div class="label">Balance</div>
+        <div id="balance-amount">$0.00</div>
+      </div>
+      <button id="add-btn" aria-label="Add transaction">＋</button>
+    </div>
+
+    <div class="top-actions">
+      <button id="plan-btn" aria-label="Open detailed planner">Plan</button>
+      <button id="share-btn" aria-label="Share read-only view">Share</button>
+    </div>
+
+    <div class="main">
+      <div class="chart-wrap">
+        <canvas id="pie"></canvas>
+      </div>
+
+      <div class="summary">
+        <div class="summary-item">
+          <div>Income</div>
+          <div id="income-amount" class="green">$0.00</div>
+        </div>
+        <div class="summary-item">
+          <div>Expenses</div>
+          <div id="expense-amount" class="red">$0.00</div>
+        </div>
+      </div>
+
+      <div id="transactions" class="transactions">
+        <!-- transactions go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit sheet -->
+  <div id="sheet" class="sheet" aria-hidden="true">
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <div id="sheet-title">New Transaction</div>
+        <button id="close-sheet" aria-label="Close">✕</button>
+      </div>
+
+      <form id="tx-form" autocomplete="off">
+        <div class="row">
+          <label>Amount</label>
+          <input type="number" id="amount" step="0.01" placeholder="e.g. 45.00" required />
+        </div>
+
+        <div class="row">
+          <label>Type</label>
+          <div class="segmented">
+            <button type="button" data-type="income" class="seg active">Income</button>
+            <button type="button" data-type="expense" class="seg">Expense</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Category</label>
+          <select id="category">
+            <option value="Salary">Salary</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Transport">Transport</option>
+            <option value="Dining">Dining</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>Note (optional)</label>
+          <input type="text" id="note" maxlength="80" placeholder="Coffee, rent, etc." />
+        </div>
+
+        <div class="row actions">
+          <button id="save-btn" class="primary" type="submit">Save</button>
+          <button id="delete-btn" class="danger" type="button" hidden>Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="share-toast"></div>
+
+  <script type="module">
+    import { Chart, ArcElement, Tooltip, Legend, DoughnutController } from "chart.js";
+    import dayjs from "dayjs";
+
+    Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
+
+    const STORAGE_KEY = "myBudgetBuddy.transactions.v1";
+
+    const $ = sel => document.querySelector(sel);
+
+    let transactions = load();
+    let editingId = null;
+
+    /* Elements */
+    const balanceEl = $("#balance-amount");
+    const incomeEl = $("#income-amount");
+    const expenseEl = $("#expense-amount");
+    const txList = $("#transactions");
+    const addBtn = $("#add-btn");
+    const planBtn = $("#plan-btn");
+    const shareBtn = $("#share-btn");
+    const sheet = $("#sheet");
+    const closeSheet = $("#close-sheet");
+    const txForm = $("#tx-form");
+    const amountInput = $("#amount");
+    const categoryInput = $("#category");
+    const noteInput = $("#note");
+    const deleteBtn = $("#delete-btn");
+    const sheetTitle = $("#sheet-title");
+    const segButtons = document.querySelectorAll(".segmented .seg");
+    const shareToast = $("#share-toast");
+
+    /* Chart */
+    const pieCtx = document.getElementById("pie").getContext("2d");
+    let pieChart = new Chart(pieCtx, {
+      type: "doughnut",
+      data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels:{padding:8,boxWidth:12}
+          }
+        }
+      }
+    });
+
+    /* Events */
+    addBtn.addEventListener("click", () => openSheet());
+    planBtn.addEventListener("click", () => {
+      // open the original comprehensive planner in a new tab
+      window.open("myBudgetBuddy_00.html", "_blank");
+    });
+    closeSheet.addEventListener("click", closeSheetFn);
+    sheet.addEventListener("click", (e)=>{ if(e.target===sheet) closeSheetFn(); });
+
+    segButtons.forEach(b=>{
+      b.addEventListener("click", ()=> {
+        segButtons.forEach(s=>s.classList.remove("active"));
+        b.classList.add("active");
+      });
+    });
+
+    txForm.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const raw = parseFloat(amountInput.value || "0");
+      if (!raw || !isFinite(raw)) return;
+      const type = document.querySelector(".segmented .seg.active").dataset.type || "income";
+      const amount = Math.abs(raw);
+      const tx = {
+        id: editingId || ("t"+Date.now().toString(36)),
+        amount: amount,
+        type,
+        category: categoryInput.value || "Other",
+        note: noteInput.value || "",
+        date: dayjs().toISOString()
+      };
+      if (editingId){
+        transactions = transactions.map(t=> t.id===editingId ? tx : t);
+      } else {
+        transactions.unshift(tx);
+      }
+      save();
+      closeSheetFn();
+      render();
+    });
+
+    deleteBtn.addEventListener("click", ()=>{
+      if (!editingId) return;
+      transactions = transactions.filter(t=>t.id!==editingId);
+      save();
+      closeSheetFn();
+      render();
+    });
+
+    shareBtn.addEventListener("click", handleShare);
+
+    /* helpers */
+    function openSheet(tx){
+      sheet.setAttribute("aria-hidden","false");
+      sheetTitle.textContent = tx ? "Edit Transaction" : "New Transaction";
+      editingId = tx ? tx.id : null;
+      amountInput.value = tx ? tx.amount : "";
+      noteInput.value = tx ? tx.note : "";
+      categoryInput.value = tx ? tx.category : "Other";
+      deleteBtn.hidden = !tx;
+      // set segmented
+      segButtons.forEach(s=>{
+        s.classList.toggle("active", (!tx && s.dataset.type==="income") || (tx && s.dataset.type===tx.type));
+      });
+      // focus
+      setTimeout(()=> amountInput.focus(), 120);
+    }
+
+    function closeSheetFn(){
+      sheet.setAttribute("aria-hidden","true");
+      editingId = null;
+      txForm.reset();
+      // reset type to income by default
+      segButtons.forEach(s=>{
+        s.classList.toggle("active", s.dataset.type==="income");
+      });
+    }
+
+    async function handleShare(){
+      const url = window.location.href;
+      const title = "Budget Buddy (read-only view)";
+      const text = "Open this link on your device while connected to the same local network.";
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text, url });
+          showToast("Shared link using your device's share menu.");
+        } catch (err) {
+          if (err && err.name !== "AbortError") {
+            showToast("Unable to share via system menu. You can still copy the URL.");
+          }
+        }
+      } else {
+        showToast("Share this URL with others on your network:\n" + url);
+      }
+    }
+
+    let toastTimeout;
+    function showToast(message){
+      if (!shareToast) return;
+      shareToast.textContent = message;
+      shareToast.classList.add("visible");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(()=>{
+        shareToast.classList.remove("visible");
+      }, 3500);
+    }
+
+    function render(){
+      // totals
+      const income = transactions.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+      const expense = transactions.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+      const balance = income - expense;
+      balanceEl.textContent = formatMoney(balance);
+      incomeEl.textContent = formatMoney(income);
+      expenseEl.textContent = formatMoney(expense);
+
+      // transactions list
+      txList.innerHTML = "";
+      transactions.forEach(tx=>{
+        const el = document.createElement("div");
+        el.className = "tx";
+        el.innerHTML = `
+          <div class="left">
+            <div class="dot ${tx.type}">${tx.category[0] || "?"}</div>
+            <div class="meta">
+              <div class="cat">${tx.category}</div>
+              <div class="note">${tx.note || dayjs(tx.date).format("MMM D")}</div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="amt ${tx.type==='expense' ? 'red' : 'green'}">
+              ${tx.type==='expense' ? '-' : ''}${formatMoney(tx.amount)}
+            </div>
+          </div>
+        `;
+        el.addEventListener("click", ()=> openSheet(tx));
+        txList.appendChild(el);
+      });
+
+      // pie chart by category for expenses
+      const grouped = {};
+      transactions.forEach(t=>{
+        const key = t.category;
+        grouped[key] = grouped[key] || 0;
+        grouped[key] += t.type === "expense" ? t.amount : 0;
+      });
+
+      const labels = Object.keys(grouped).filter(k=>grouped[k]>0);
+      const data = labels.map(l=>grouped[l]);
+      const colors = generateColors(labels.length);
+      pieChart.data.labels = labels.length ? labels : ["No expenses"];
+      pieChart.data.datasets[0].data = labels.length ? data : [1];
+      pieChart.data.datasets[0].backgroundColor = labels.length ? colors : ["#e9eef6"];
+      pieChart.update();
+    }
+
+    /* storage */
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    }
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return sample();
+        return JSON.parse(raw);
+      }catch(e){
+        return sample();
+      }
+    }
+
+    /* utils */
+    function formatMoney(v){
+      const sign = v<0 ? "-" : "";
+      const n = Math.abs(v).toFixed(2);
+      return sign + "$" + Number(n).toLocaleString();
+    }
+    function generateColors(n){
+      const base = [
+        "#FF8A66","#2EBD85","#FFD166","#6C8CF5","#FF6BBA",
+        "#8BD4FF","#B4FFB0","#F6C8FF","#F7B267","#9AD0F5"
+      ];
+      const out = [];
+      for(let i=0;i<n;i++) out.push(base[i % base.length]);
+      return out;
+    }
+
+    function sample(){
+      return [
+        { id:"t1", amount:3200, type:"income", category:"Salary", note:"June salary", date: dayjs().subtract(8,"day").toISOString() },
+        { id:"t2", amount:45.5, type:"expense", category:"Groceries", note:"Weekly shop", date: dayjs().subtract(6,"day").toISOString() },
+        { id:"t3", amount:12.75, type:"expense", category:"Transport", note:"Taxi", date: dayjs().subtract(3,"day").toISOString() }
+      ];
+    }
+
+    /* init */
+    render();
+  </script>
+</body>
+</html>
