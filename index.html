@@ -15,7 +15,7 @@
   </script>
 
   <style>
-    /* ─── Reset & Root ─────────────────────────────────────── */
+    /* ─── Root ─────────────────────────────── */
     :root{
       --bg:#fbfbfb;
       --card:#ffffff;
@@ -23,83 +23,166 @@
       --accent:#107B59;
       --danger:#D9534F;
       --green:#2EBD85;
+      --btc:#F7931A;
       font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
       -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html,body,#app{height:100%}
     body{
-      background:var(--bg);
-      color:#111;
-      -webkit-user-select:none;
-      user-select:none;
-      font-size:15px;
-      padding:14px;
+      background:var(--bg);color:#111;
+      -webkit-user-select:none;user-select:none;
+      font-size:15px;padding:14px;
     }
 
-    /* ─── App Layout ───────────────────────────────────────── */
-    #app{
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-    }
-    .top-actions{
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .top-actions button{
-      padding:8px 10px;
-      border-radius:10px;
-      border:0;
-      background:#e7f3ee;
-      color:var(--accent);
-      font-size:13px;
-      font-weight:500;
-      white-space:nowrap;
-      cursor:pointer;
-    }
-    #plan-btn{ background:#eef0ff; color:#4a5aed; }
-    #share-btn{ background:#f3efe2; color:#b38722; }
+    /* ─── App ───────────────────────────────── */
+    #app{height:100%;display:flex;flex-direction:column;gap:12px;}
 
+    /* Top row */
+    .top{display:flex;align-items:stretch;gap:8px;}
+
+    /* Balance card */
     .balance{
-      background:var(--card);
-      padding:10px 14px;
-      border-radius:12px;
-      box-shadow:0 6px 16px rgba(16,27,39,0.06);
-      min-width:0;
-      flex:1;
+      background:var(--card);padding:10px 14px;border-radius:12px;
+      box-shadow:0 6px 16px rgba(16,27,39,0.06);min-width:0;flex:1;
     }
     .balance .label{font-size:12px;color:var(--muted)}
-    #balance-amount{font-size:20px;font-weight:600;margin-top:6px}
+    #balance-amount{font-size:20px;font-weight:600;margin-top:4px}
 
+    /* Online/Offline toggle pill */
+    #mode-toggle{
+      display:flex;align-items:center;gap:5px;
+      background:var(--card);border:none;border-radius:20px;
+      padding:6px 10px;cursor:pointer;font-size:11px;font-weight:600;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);white-space:nowrap;
+      transition:background .2s;flex-shrink:0;align-self:flex-start;margin-top:2px;
+    }
+    #mode-toggle .dot{
+      width:8px;height:8px;border-radius:50%;background:#ccc;
+      transition:background .2s;flex-shrink:0;
+    }
+    #mode-toggle.online .dot{background:#2EBD85;}
+    #mode-toggle.online{color:#107B59;}
+    #mode-toggle.offline .dot{background:#aaa;}
+    #mode-toggle.offline{color:#888;}
+
+    /* Add button */
     #add-btn{
       width:56px;height:56px;border-radius:14px;border:0;
       background:linear-gradient(180deg,var(--accent),#0f6f50);
       color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 8px 20px rgba(16,123,89,0.18);
-      flex-shrink:0;cursor:pointer;
+      box-shadow:0 8px 20px rgba(16,123,89,0.18);flex-shrink:0;cursor:pointer;
     }
 
-    .main{
-      background:transparent;
-      display:flex;flex-direction:column;
-      gap:12px;flex:1;overflow:hidden;
+    /* Action bar */
+    .top-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .top-actions button{
+      padding:8px 10px;border-radius:10px;border:0;
+      background:#e7f3ee;color:var(--accent);
+      font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;
     }
+    #plan-btn{background:#eef0ff;color:#4a5aed;}
+    #share-btn{background:#f3efe2;color:#b38722;}
+    #btc-btn{background:#fff4e8;color:var(--btc);font-weight:700;}
+
+    /* ─── Bitcoin Panel ─────────────────────── */
+    #btc-panel{
+      background:var(--card);border-radius:14px;
+      box-shadow:0 6px 20px rgba(247,147,26,0.10);
+      overflow:hidden;
+      display:none; /* shown when open */
+    }
+    #btc-panel.open{display:block;}
+
+    #btc-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 14px;
+      background:linear-gradient(135deg,#fff8f0,#fff3e0);
+      border-bottom:1px solid #ffe0b0;
+    }
+    #btc-header-left{display:flex;align-items:center;gap:8px;}
+    #btc-logo{font-size:22px;line-height:1;}
+    #btc-title-group{}
+    #btc-title{font-size:13px;font-weight:700;color:#c56a00;}
+    #btc-price-row{display:flex;align-items:center;gap:6px;margin-top:2px;}
+    #btc-price{font-size:12px;color:var(--muted);}
+    #btc-price-change{font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px;}
+    #btc-price-change.up{background:#e8faf2;color:#107B59;}
+    #btc-price-change.down{background:#fdecea;color:#D9534F;}
+    #btc-status-badge{
+      font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;
+    }
+    #btc-status-badge.live{background:#e8faf2;color:#107B59;}
+    #btc-status-badge.cached{background:#fff3cd;color:#856404;}
+    #btc-status-badge.offline{background:#f1f1f1;color:#888;}
+    #btc-refresh{
+      background:none;border:1px solid #f0c080;border-radius:8px;
+      padding:4px 8px;font-size:11px;color:#c56a00;cursor:pointer;
+    }
+    #btc-refresh:hover{background:#fff3e0;}
+
+    #btc-body{padding:12px 14px;}
+
+    /* BTC wallets */
+    .btc-wallets{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+    .btc-wallet-row{
+      display:flex;align-items:center;gap:8px;
+      background:#fafafa;border:1px solid #f0e8d8;
+      border-radius:10px;padding:8px 10px;
+    }
+    .btc-wallet-icon{
+      width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(135deg,#F7931A,#e87d08);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:14px;font-weight:700;flex-shrink:0;
+    }
+    .btc-wallet-info{flex:1;min-width:0;}
+    .btc-wallet-name{font-size:12px;font-weight:600;color:#333;}
+    .btc-wallet-btc{font-size:11px;color:var(--muted);font-family:monospace;letter-spacing:.02em;}
+    .btc-wallet-usd{font-size:13px;font-weight:700;color:#c56a00;text-align:right;white-space:nowrap;}
+    .btc-wallet-del{
+      background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:2px 4px;
+    }
+    .btc-wallet-del:hover{color:var(--danger);}
+
+    /* Add wallet form */
+    .btc-add-form{
+      display:flex;gap:6px;margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .btc-add-form input{
+      padding:8px 10px;border:1px solid #eee;border-radius:10px;font-size:13px;
+      background:#fff;flex:1;min-width:0;
+      -webkit-user-select:text;user-select:text;
+    }
+    .btc-add-form input::placeholder{color:#bbb;}
+    .btc-add-form button{
+      padding:8px 12px;background:var(--btc);color:#fff;
+      border:none;border-radius:10px;font-size:13px;cursor:pointer;white-space:nowrap;
+    }
+    .btc-add-form button:hover{background:#e07d10;}
+
+    /* BTC totals bar */
+    #btc-totals{
+      display:flex;gap:10px;padding-top:8px;border-top:1px solid #f0e8d8;
+    }
+    .btc-total-item{
+      flex:1;background:#fff8f0;border-radius:10px;
+      padding:8px 10px;
+      display:flex;flex-direction:column;gap:2px;
+    }
+    .btc-total-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+    .btc-total-val{font-size:14px;font-weight:700;color:#c56a00;}
+    .btc-total-val.btc-val{font-family:monospace;font-size:12px;color:#888;}
+
+    /* ─── Main ──────────────────────────────── */
+    .main{background:transparent;display:flex;flex-direction:column;gap:12px;flex:1;overflow:hidden;}
     .chart-wrap{
       background:var(--card);padding:10px;border-radius:12px;
       display:flex;align-items:center;justify-content:center;
       height:170px;box-shadow:0 6px 16px rgba(16,27,39,0.06);
     }
-    .summary{ display:flex;gap:10px; }
+    .summary{display:flex;gap:10px;}
     .summary-item{
       background:var(--card);padding:10px 12px;border-radius:10px;flex:1;
       display:flex;align-items:center;justify-content:space-between;
@@ -108,6 +191,7 @@
     .green{color:var(--green);font-weight:600}
     .red{color:var(--danger);font-weight:600}
 
+    /* Transactions */
     .transactions{
       background:var(--card);padding:10px;border-radius:12px;
       flex:1;overflow:auto;box-shadow:0 8px 24px rgba(16,27,39,0.06);
@@ -117,13 +201,9 @@
       padding:10px 8px;border-radius:10px;cursor:pointer;
     }
     .tx:hover{background:#f9fafb}
-    .tx + .tx{margin-top:6px}
+    .tx+.tx{margin-top:6px}
     .tx .left{display:flex;gap:10px;align-items:center}
-    .dot{
-      width:44px;height:44px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      color:#fff;font-weight:600;
-    }
+    .dot{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;}
     .dot.income{background:linear-gradient(180deg,#2EBD85,#1F9A70)}
     .dot.expense{background:linear-gradient(180deg,#FF8A66,#D9534F)}
     .tx .meta{display:flex;flex-direction:column}
@@ -131,12 +211,11 @@
     .tx .meta .note{font-size:12px;color:var(--muted)}
     .tx .amt{font-weight:700}
 
-    /* ─── Transaction Sheet ────────────────────────────────── */
+    /* ─── Transaction Sheet ─────────────────── */
     .sheet{
       position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;
-      background:rgba(0,0,0,0.18);
-      visibility:hidden;opacity:0;transition:opacity .18s, visibility .18s;
-      z-index:20;
+      background:rgba(0,0,0,0.18);visibility:hidden;opacity:0;
+      transition:opacity .18s, visibility .18s;z-index:20;
     }
     .sheet[aria-hidden="false"]{visibility:visible;opacity:1}
     .sheet-card{
@@ -144,16 +223,12 @@
       border-radius:16px 16px 0 0;padding:14px;
       box-shadow:0 -8px 36px rgba(8,17,29,0.12);
     }
-    .sheet-header{
-      display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
-    }
+    .sheet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
     .sheet-header #sheet-title{font-weight:700}
     .sheet-header #close-sheet{background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted)}
     .row{margin-top:8px;display:flex;flex-direction:column;gap:6px}
     .row label{font-size:12px;color:var(--muted)}
-    .row input,.row select{
-      padding:10px;border-radius:10px;border:1px solid #eee;font-size:15px;background:#fff;
-    }
+    .row input,.row select{padding:10px;border-radius:10px;border:1px solid #eee;font-size:15px;background:#fff;}
     .segmented{display:flex;border-radius:10px;overflow:hidden;border:1px solid #eee}
     .segmented .seg{flex:1;padding:8px 10px;background:transparent;border:0;cursor:pointer}
     .segmented .seg.active{background:linear-gradient(180deg,#f0fff8,#f5fff9);color:var(--accent);font-weight:600}
@@ -161,7 +236,7 @@
     button.primary{flex:1;background:var(--accent);color:#fff;padding:10px;border-radius:10px;border:0;cursor:pointer}
     button.danger{flex:1;background:transparent;color:var(--danger);border:1px solid #ffdddd;border-radius:10px;padding:10px;cursor:pointer}
 
-    /* ─── Toast ────────────────────────────────────────────── */
+    /* ─── Toast ─────────────────────────────── */
     #share-toast{
       position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
       background:rgba(0,0,0,0.86);color:#fff;padding:10px 14px;border-radius:10px;
@@ -170,44 +245,25 @@
     }
     #share-toast.visible{opacity:1;pointer-events:auto;}
 
-    /* ─── Planner Modal ────────────────────────────────────── */
+    /* ─── Planner Modal ─────────────────────── */
     #planner-modal{
-      position:fixed;inset:0;
-      background:rgba(0,0,0,0.45);
+      position:fixed;inset:0;background:rgba(0,0,0,0.45);
       display:flex;align-items:stretch;justify-content:center;
-      visibility:hidden;opacity:0;
-      transition:opacity .2s, visibility .2s;
-      z-index:30;
-      overflow:hidden;
+      visibility:hidden;opacity:0;transition:opacity .2s, visibility .2s;
+      z-index:30;overflow:hidden;
     }
     #planner-modal.open{visibility:visible;opacity:1;}
-    #planner-inner{
-      background:#f4f4f4;
-      width:100%;max-width:900px;
-      display:flex;flex-direction:column;
-      overflow:hidden;
-    }
+    #planner-inner{background:#f4f4f4;width:100%;max-width:900px;display:flex;flex-direction:column;overflow:hidden;}
     #planner-topbar{
       display:flex;align-items:center;justify-content:space-between;
-      background:#fff;
-      padding:12px 16px;
-      border-bottom:1px solid #e0e0e0;
-      flex-shrink:0;
+      background:#fff;padding:12px 16px;border-bottom:1px solid #e0e0e0;flex-shrink:0;
     }
     #planner-topbar h2{font-size:16px;font-weight:700;color:#333}
-    #close-planner{
-      background:none;border:none;font-size:20px;cursor:pointer;color:#666;line-height:1;
-    }
-    #planner-body{
-      flex:1;overflow-y:auto;
-      padding:16px;
-    }
+    #close-planner{background:none;border:none;font-size:20px;cursor:pointer;color:#666;line-height:1;}
+    #planner-body{flex:1;overflow-y:auto;padding:16px;}
 
-    /* Planner sections */
-    .p-section{
-      background:#fff;padding:16px;margin-bottom:16px;
-      border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.08);
-    }
+    /* Planner internals */
+    .p-section{background:#fff;padding:16px;margin-bottom:16px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.08);}
     .p-section h2{font-size:14px;font-weight:700;color:#333;margin-bottom:10px}
     .p-section label{font-size:12px;color:#555;display:inline-block;margin-top:6px;margin-right:4px}
     .p-section input,.p-section select{
@@ -226,11 +282,7 @@
     .p-section th{background:#f2f2f2;padding:7px 8px;text-align:left;border:1px solid #ddd}
     .p-section td{border:1px solid #ddd;padding:7px 8px}
     #p-budgetOverview{display:flex;flex-wrap:wrap;gap:14px;}
-    .p-month-card{
-      background:#fff;padding:14px;border-radius:8px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.09);
-      width:280px;flex-shrink:0;
-    }
+    .p-month-card{background:#fff;padding:14px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.09);width:280px;flex-shrink:0;}
     .p-month-card h3{font-size:13px;font-weight:700;margin-bottom:8px;color:#333}
     .p-month-card p{font-size:12px;margin-bottom:4px;color:#444}
     .p-month-card table{font-size:11px}
@@ -239,35 +291,91 @@
       body{padding:10px}
       .sheet-card{padding:12px}
       #add-btn{width:52px;height:52px}
-      .top{align-items:flex-start}
-      .top-actions{flex-direction:column;align-items:flex-end}
+      .top{flex-wrap:wrap;}
+      .top-actions{flex-wrap:wrap;}
       .p-month-card{width:100%}
+      #btc-totals{flex-direction:column;}
     }
   </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════
-     MAIN TRACKER
-════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════ -->
 <div id="app">
+
+  <!-- Balance + Mode toggle + Add -->
   <div class="top">
     <div class="balance">
-      <div class="label">Balance</div>
+      <div class="label">Cash Balance</div>
       <div id="balance-amount">$0.00</div>
     </div>
-    <button id="add-btn" aria-label="Add transaction">&#xFF0B;</button>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+      <button id="mode-toggle" class="offline" title="Toggle Online / Offline">
+        <span class="dot"></span><span id="mode-label">Offline</span>
+      </button>
+      <button id="add-btn" aria-label="Add transaction">&#xFF0B;</button>
+    </div>
   </div>
 
+  <!-- Action buttons -->
   <div class="top-actions">
     <button id="save-local-btn">Save</button>
     <button id="export-btn">Export</button>
     <button id="import-btn">Import</button>
     <input id="import-file" type="file" accept=".json" style="display:none" />
+    <button id="btc-btn">&#x20BF; Bitcoin</button>
     <button id="plan-btn">Plan</button>
     <button id="share-btn">Share</button>
   </div>
 
+  <!-- Bitcoin Panel -->
+  <div id="btc-panel">
+    <div id="btc-header">
+      <div id="btc-header-left">
+        <div id="btc-logo">&#x20BF;</div>
+        <div id="btc-title-group">
+          <div id="btc-title">Bitcoin Wallets</div>
+          <div id="btc-price-row">
+            <span id="btc-price">Price: —</span>
+            <span id="btc-price-change"></span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span id="btc-status-badge" class="offline">Offline</span>
+        <button id="btc-refresh" title="Refresh BTC price">&#x27F3; Refresh</button>
+      </div>
+    </div>
+    <div id="btc-body">
+      <!-- Add wallet form -->
+      <div class="btc-add-form">
+        <input type="text" id="btc-wallet-name" placeholder="Wallet label (e.g. Cold Storage)" maxlength="30" />
+        <input type="number" id="btc-wallet-amount" placeholder="Amount (BTC)" step="0.00000001" min="0" />
+        <button onclick="btcAddWallet()">+ Add</button>
+      </div>
+      <!-- Wallet list -->
+      <div class="btc-wallets" id="btc-wallets-list"></div>
+      <!-- Totals -->
+      <div id="btc-totals">
+        <div class="btc-total-item">
+          <div class="btc-total-label">Total BTC</div>
+          <div class="btc-total-val btc-val" id="btc-total-btc">0.00000000 &#x20BF;</div>
+        </div>
+        <div class="btc-total-item">
+          <div class="btc-total-label">Total USD Value</div>
+          <div class="btc-total-val" id="btc-total-usd">$—</div>
+        </div>
+        <div class="btc-total-item">
+          <div class="btc-total-label">Last Updated</div>
+          <div class="btc-total-val" id="btc-last-updated" style="font-size:11px;color:#999">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart + Summary + Transactions -->
   <div class="main">
     <div class="chart-wrap">
       <canvas id="pie"></canvas>
@@ -330,9 +438,9 @@
 
 <div id="share-toast"></div>
 
-<!-- ════════════════════════════════════════════════
+<!-- ══════════════════════════════════════════
      PLANNER MODAL
-════════════════════════════════════════════════ -->
+══════════════════════════════════════════ -->
 <div id="planner-modal">
   <div id="planner-inner">
     <div id="planner-topbar">
@@ -340,14 +448,12 @@
       <button id="close-planner" aria-label="Close planner">&#x2715;</button>
     </div>
     <div id="planner-body">
-
       <div class="p-section">
         <h2>1. Set Up Budget Parameters</h2>
         <label for="p-startYear">Start Year:</label>
         <input type="number" id="p-startYear" value="2026" min="1900" max="2100">
         <label for="p-numMonths">Number of Months:</label>
-        <input type="number" id="p-numMonths" value="12" min="1">
-        <br>
+        <input type="number" id="p-numMonths" value="12" min="1"><br>
         <label for="p-defaultIncome">Default Projected Income:</label>
         <input type="number" id="p-defaultIncome" value="5000" step="0.01">
         <label for="p-incomeFrequency">Income Frequency:</label>
@@ -357,89 +463,65 @@
           <option value="biweekly">Bi-Weekly</option>
           <option value="yearly">Yearly</option>
           <option value="custom">Custom</option>
-        </select>
-        <br>
+        </select><br>
         <button onclick="pInitializeBudget()">Initialize Budget</button>
       </div>
-
       <div class="p-section">
         <h2>2. Adjust Income for Specific Months or Ranges</h2>
-        <label for="p-incomeMonthStart">Start Month:</label>
-        <input type="number" id="p-incomeMonthStart" min="1" value="1">
-        <label for="p-incomeMonthEnd">End Month:</label>
-        <input type="number" id="p-incomeMonthEnd" min="1" value="1">
-        <label for="p-newIncome">New Income Amount:</label>
-        <input type="number" id="p-newIncome" step="0.01">
-        <br>
+        <label>Start Month:</label><input type="number" id="p-incomeMonthStart" min="1" value="1">
+        <label>End Month:</label><input type="number" id="p-incomeMonthEnd" min="1" value="1">
+        <label>New Income Amount:</label><input type="number" id="p-newIncome" step="0.01"><br>
         <button onclick="pUpdateIncomeRange()">Update Income</button>
       </div>
-
       <div class="p-section">
         <h2>3. Manage Expense Categories</h2>
-        <label for="p-categoryName">Category Name:</label>
-        <input type="text" id="p-categoryName">
-        <label for="p-categoryBudget">Default Budget Amount:</label>
-        <input type="number" id="p-categoryBudget" step="0.01">
+        <label>Category Name:</label><input type="text" id="p-categoryName">
+        <label>Default Budget Amount:</label><input type="number" id="p-categoryBudget" step="0.01">
         <button onclick="pAddCategory()">Add Category</button>
         <div id="p-categoriesList"></div>
       </div>
-
       <div class="p-section">
         <h2>4. Adjust Expenses for Specific Months or Ranges</h2>
-        <label for="p-expenseCategory">Select Category:</label>
-        <select id="p-expenseCategory"></select>
-        <label for="p-expenseMonthStart">Start Month:</label>
-        <input type="number" id="p-expenseMonthStart" min="1" value="1">
-        <label for="p-expenseMonthEnd">End Month:</label>
-        <input type="number" id="p-expenseMonthEnd" min="1" value="1">
-        <label for="p-newExpense">New Expense Amount:</label>
-        <input type="number" id="p-newExpense" step="0.01">
-        <br>
+        <label>Select Category:</label><select id="p-expenseCategory"></select>
+        <label>Start Month:</label><input type="number" id="p-expenseMonthStart" min="1" value="1">
+        <label>End Month:</label><input type="number" id="p-expenseMonthEnd" min="1" value="1">
+        <label>New Expense Amount:</label><input type="number" id="p-newExpense" step="0.01"><br>
         <button onclick="pUpdateExpenseRange()">Update Expense</button>
       </div>
-
       <div class="p-section">
         <h2>5. Track Actual Spending</h2>
-        <label for="p-actualCategory">Select Category:</label>
-        <select id="p-actualCategory"></select>
-        <label for="p-actualMonth">Month (1 to N):</label>
-        <input type="number" id="p-actualMonth" min="1">
-        <label for="p-actualAmount">Actual Amount Spent:</label>
-        <input type="number" id="p-actualAmount" step="0.01">
-        <br>
+        <label>Select Category:</label><select id="p-actualCategory"></select>
+        <label>Month (1 to N):</label><input type="number" id="p-actualMonth" min="1">
+        <label>Actual Amount Spent:</label><input type="number" id="p-actualAmount" step="0.01"><br>
         <button onclick="pAddActualExpense()">Add Actual Expense</button>
       </div>
-
       <div class="p-section">
         <h2>Budget Overview</h2>
         <div id="p-budgetOverview"></div>
       </div>
-
       <div class="p-section">
         <h2>Export / Import Planner Data</h2>
         <button onclick="pExportData()">Export as JSON</button>
         <input type="file" id="p-importFile" accept=".json" style="margin:4px 0;-webkit-user-select:text;user-select:text">
         <button onclick="pImportData()">Import from JSON</button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════
-     TRACKER SCRIPT (ES module)
-════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     TRACKER SCRIPT
+══════════════════════════════════════════ -->
 <script type="module">
   import { Chart, ArcElement, Tooltip, Legend, DoughnutController } from "chart.js";
   import dayjs from "dayjs";
-
   Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
   const STORAGE_KEY = "myBudgetBuddy.transactions.v1";
-  const $ = sel => document.querySelector(sel);
+  const $ = s => document.querySelector(s);
 
   let transactions = load();
-  let editingId = null;
+  let editingId    = null;
 
   const balanceEl     = $("#balance-amount");
   const incomeEl      = $("#income-amount");
@@ -469,365 +551,539 @@
   const pieCtx = document.getElementById("pie").getContext("2d");
   let pieChart = new Chart(pieCtx, {
     type: "doughnut",
-    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
-    options: {
-      maintainAspectRatio: false,
-      plugins: { legend: { position: "bottom", labels: { padding: 8, boxWidth: 12 } } }
+    data: { labels:[], datasets:[{data:[],backgroundColor:[]}] },
+    options:{
+      maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom",labels:{padding:8,boxWidth:12}}}
     }
   });
 
-  /* ── Events ── */
+  /* Events */
   addBtn.addEventListener("click", () => openSheet());
   closeSheet.addEventListener("click", closeSheetFn);
-  sheet.addEventListener("click", e => { if (e.target === sheet) closeSheetFn(); });
-
+  sheet.addEventListener("click", e => { if(e.target===sheet) closeSheetFn(); });
   planBtn.addEventListener("click", () => plannerModal.classList.add("open"));
   closePlanner.addEventListener("click", () => plannerModal.classList.remove("open"));
-  plannerModal.addEventListener("click", e => { if (e.target === plannerModal) plannerModal.classList.remove("open"); });
+  plannerModal.addEventListener("click", e => { if(e.target===plannerModal) plannerModal.classList.remove("open"); });
 
-  segButtons.forEach(b => {
-    b.addEventListener("click", () => {
-      segButtons.forEach(s => s.classList.remove("active"));
-      b.classList.add("active");
-    });
-  });
+  segButtons.forEach(b => b.addEventListener("click", () => {
+    segButtons.forEach(s=>s.classList.remove("active"));
+    b.classList.add("active");
+  }));
 
   txForm.addEventListener("submit", e => {
     e.preventDefault();
-    const raw = parseFloat(amountInput.value || "0");
-    if (!raw || !isFinite(raw)) return;
-    const type   = document.querySelector(".segmented .seg.active").dataset.type || "income";
+    const raw = parseFloat(amountInput.value||"0");
+    if(!raw||!isFinite(raw)) return;
+    const type   = document.querySelector(".segmented .seg.active").dataset.type||"income";
     const amount = Math.abs(raw);
     const tx = {
-      id: editingId || ("t" + Date.now().toString(36)),
+      id: editingId||("t"+Date.now().toString(36)),
       amount, type,
-      category: categoryInput.value || "Other",
-      note: noteInput.value || "",
+      category: categoryInput.value||"Other",
+      note: noteInput.value||"",
       date: dayjs().toISOString()
     };
-    if (editingId) {
-      transactions = transactions.map(t => t.id === editingId ? tx : t);
-    } else {
-      transactions.unshift(tx);
-    }
+    if(editingId){ transactions = transactions.map(t=>t.id===editingId?tx:t); }
+    else { transactions.unshift(tx); }
     save(); closeSheetFn(); render();
   });
 
   deleteBtn.addEventListener("click", () => {
-    if (!editingId) return;
-    transactions = transactions.filter(t => t.id !== editingId);
+    if(!editingId) return;
+    transactions = transactions.filter(t=>t.id!==editingId);
     save(); closeSheetFn(); render();
   });
 
   shareBtn.addEventListener("click", handleShare);
-  saveLocalBtn.addEventListener("click", () => { save(); showToast("Saved locally."); });
+  saveLocalBtn.addEventListener("click", ()=>{ save(); showToast("Saved locally."); });
 
   exportBtn.addEventListener("click", () => {
     try {
-      const blob = new Blob([JSON.stringify(transactions, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "transactions.json"; a.click();
+      const blob = new Blob([JSON.stringify(transactions,null,2)],{type:"application/json"});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href=url; a.download="transactions.json"; a.click();
       URL.revokeObjectURL(url);
       showToast("Exported transactions.json");
     } catch { showToast("Export failed."); }
   });
 
-  importBtn.addEventListener("click", () => importFile.click());
+  importBtn.addEventListener("click", ()=>importFile.click());
   importFile.addEventListener("change", e => {
-    const f = e.target.files[0]; if (!f) return;
+    const f = e.target.files[0]; if(!f) return;
     const r = new FileReader();
-    r.onload = () => {
+    r.onload = ()=>{
       try {
         const parsed = JSON.parse(String(r.result));
-        if (!Array.isArray(parsed)) { showToast("Invalid format."); return; }
-        if (!parsed.every(it => it && typeof it.amount === "number" && typeof it.type === "string")) {
-          showToast("File looks invalid."); return;
+        if(!Array.isArray(parsed)){showToast("Invalid format.");return;}
+        if(!parsed.every(it=>it&&typeof it.amount==="number"&&typeof it.type==="string")){
+          showToast("File looks invalid.");return;
         }
-        transactions = parsed; save(); render(); showToast("Imported transactions.");
+        transactions=parsed; save(); render(); showToast("Imported transactions.");
       } catch { showToast("Import failed."); }
     };
-    r.readAsText(f); importFile.value = "";
+    r.readAsText(f); importFile.value="";
   });
 
-  /* ── Helpers ── */
-  function openSheet(tx) {
-    sheet.setAttribute("aria-hidden", "false");
-    sheetTitle.textContent = tx ? "Edit Transaction" : "New Transaction";
-    editingId = tx ? tx.id : null;
-    amountInput.value   = tx ? tx.amount   : "";
-    noteInput.value     = tx ? tx.note     : "";
-    categoryInput.value = tx ? tx.category : "Other";
+  /* Helpers */
+  function openSheet(tx){
+    sheet.setAttribute("aria-hidden","false");
+    sheetTitle.textContent = tx?"Edit Transaction":"New Transaction";
+    editingId        = tx?tx.id:null;
+    amountInput.value   = tx?tx.amount:"";
+    noteInput.value     = tx?tx.note:"";
+    categoryInput.value = tx?tx.category:"Other";
     deleteBtn.hidden = !tx;
-    segButtons.forEach(s => {
-      s.classList.toggle("active",
-        (!tx && s.dataset.type === "income") || (tx && s.dataset.type === tx.type));
-    });
-    setTimeout(() => amountInput.focus(), 120);
+    segButtons.forEach(s=>s.classList.toggle("active",
+      (!tx&&s.dataset.type==="income")||(tx&&s.dataset.type===tx.type)));
+    setTimeout(()=>amountInput.focus(),120);
   }
-
-  function closeSheetFn() {
-    sheet.setAttribute("aria-hidden", "true");
-    editingId = null; txForm.reset();
-    segButtons.forEach(s => s.classList.toggle("active", s.dataset.type === "income"));
+  function closeSheetFn(){
+    sheet.setAttribute("aria-hidden","true");
+    editingId=null; txForm.reset();
+    segButtons.forEach(s=>s.classList.toggle("active",s.dataset.type==="income"));
   }
-
-  async function handleShare() {
+  async function handleShare(){
     const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Budget Buddy", text: "My budget tracker", url });
-        showToast("Shared!");
-      } catch (err) {
-        if (err?.name !== "AbortError") showToast("Can't share — copy the URL manually.");
-      }
-    } else {
-      showToast("Share URL: " + url);
-    }
+    if(navigator.share){
+      try{ await navigator.share({title:"Budget Buddy",text:"My budget",url}); showToast("Shared!"); }
+      catch(err){ if(err?.name!=="AbortError") showToast("Copy URL: "+url); }
+    } else { showToast("Share URL: "+url); }
   }
 
   let toastTimeout;
-  function showToast(msg) {
-    if (!shareToast) return;
-    shareToast.textContent = msg;
+  function showToast(msg){
+    if(!shareToast) return;
+    shareToast.textContent=msg;
     shareToast.classList.add("visible");
     clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => shareToast.classList.remove("visible"), 3500);
+    toastTimeout=setTimeout(()=>shareToast.classList.remove("visible"),3500);
   }
 
-  function render() {
-    const income  = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-    const expense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-    balanceEl.textContent = formatMoney(income - expense);
+  function render(){
+    const income  = transactions.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+    const expense = transactions.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+    balanceEl.textContent = formatMoney(income-expense);
     incomeEl.textContent  = formatMoney(income);
     expenseEl.textContent = formatMoney(expense);
 
-    txList.innerHTML = "";
-    transactions.forEach(tx => {
+    txList.innerHTML="";
+    transactions.forEach(tx=>{
       const el = document.createElement("div");
-      el.className = "tx";
-      el.innerHTML = `
+      el.className="tx";
+      el.innerHTML=`
         <div class="left">
-          <div class="dot ${tx.type}">${tx.category[0] || "?"}</div>
+          <div class="dot ${tx.type}">${tx.category[0]||"?"}</div>
           <div class="meta">
             <div class="cat">${tx.category}</div>
-            <div class="note">${tx.note || dayjs(tx.date).format("MMM D")}</div>
+            <div class="note">${tx.note||dayjs(tx.date).format("MMM D")}</div>
           </div>
         </div>
         <div class="right">
-          <div class="amt ${tx.type === "expense" ? "red" : "green"}">
-            ${tx.type === "expense" ? "-" : ""}${formatMoney(tx.amount)}
+          <div class="amt ${tx.type==="expense"?"red":"green"}">
+            ${tx.type==="expense"?"-":""}${formatMoney(tx.amount)}
           </div>
         </div>`;
-      el.addEventListener("click", () => openSheet(tx));
+      el.addEventListener("click",()=>openSheet(tx));
       txList.appendChild(el);
     });
 
-    const grouped = {};
-    transactions.forEach(t => {
-      grouped[t.category] = (grouped[t.category] || 0) + (t.type === "expense" ? t.amount : 0);
+    const grouped={};
+    transactions.forEach(t=>{
+      grouped[t.category]=(grouped[t.category]||0)+(t.type==="expense"?t.amount:0);
     });
-    const labels = Object.keys(grouped).filter(k => grouped[k] > 0);
-    const data   = labels.map(l => grouped[l]);
-    pieChart.data.labels = labels.length ? labels : ["No expenses"];
-    pieChart.data.datasets[0].data = labels.length ? data : [1];
-    pieChart.data.datasets[0].backgroundColor = labels.length ? generateColors(labels.length) : ["#e9eef6"];
+    const labels = Object.keys(grouped).filter(k=>grouped[k]>0);
+    const data   = labels.map(l=>grouped[l]);
+    pieChart.data.labels                     = labels.length?labels:["No expenses"];
+    pieChart.data.datasets[0].data           = labels.length?data:[1];
+    pieChart.data.datasets[0].backgroundColor= labels.length?generateColors(labels.length):["#e9eef6"];
     pieChart.update();
   }
 
-  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)); }
-  function load() {
-    try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : sample(); }
-    catch { return sample(); }
+  function save(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(transactions)); }
+  function load(){
+    try{ const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):sample(); }
+    catch{ return sample(); }
   }
-  function formatMoney(v) {
-    const sign = v < 0 ? "-" : "";
-    return sign + "$" + Number(Math.abs(v).toFixed(2)).toLocaleString();
+  function formatMoney(v){
+    const s=v<0?"-":"";
+    return s+"$"+Number(Math.abs(v).toFixed(2)).toLocaleString();
   }
-  function generateColors(n) {
-    const base = ["#FF8A66","#2EBD85","#FFD166","#6C8CF5","#FF6BBA","#8BD4FF","#B4FFB0","#F6C8FF","#F7B267","#9AD0F5"];
-    return Array.from({length: n}, (_, i) => base[i % base.length]);
+  function generateColors(n){
+    const b=["#FF8A66","#2EBD85","#FFD166","#6C8CF5","#FF6BBA","#8BD4FF","#B4FFB0","#F6C8FF","#F7B267","#9AD0F5"];
+    return Array.from({length:n},(_,i)=>b[i%b.length]);
   }
-  function sample() {
+  function sample(){
     return [
-      { id:"t1", amount:3200,  type:"income",  category:"Salary",    note:"June salary", date: dayjs().subtract(8,"day").toISOString() },
-      { id:"t2", amount:45.5,  type:"expense", category:"Groceries", note:"Weekly shop", date: dayjs().subtract(6,"day").toISOString() },
-      { id:"t3", amount:12.75, type:"expense", category:"Transport", note:"Taxi",        date: dayjs().subtract(3,"day").toISOString() },
+      {id:"t1",amount:3200, type:"income", category:"Salary",   note:"June salary",date:dayjs().subtract(8,"day").toISOString()},
+      {id:"t2",amount:45.5, type:"expense",category:"Groceries",note:"Weekly shop",date:dayjs().subtract(6,"day").toISOString()},
+      {id:"t3",amount:12.75,type:"expense",category:"Transport",note:"Taxi",       date:dayjs().subtract(3,"day").toISOString()},
     ];
   }
-
   render();
 </script>
 
-<!-- ════════════════════════════════════════════════
-     PLANNER SCRIPT (classic — global scope)
-════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     BITCOIN SCRIPT
+══════════════════════════════════════════ -->
 <script>
-  const P_KEY = "budgetAppData";
+  /* ── State ── */
+  const BTC_WALLETS_KEY = "myBudgetBuddy.btcWallets.v1";
+  const BTC_PRICE_KEY   = "myBudgetBuddy.btcPrice.v1";
+  const BTC_API         = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true";
 
-  let pBudgetData = {
-    startYear: 2026, numMonths: 12, defaultIncome: 5000,
-    incomeFrequency: "monthly", months: [], categories: []
-  };
+  let isOnline     = false;   // start offline
+  let btcWallets   = loadBtcWallets();
+  let btcPriceData = loadBtcPrice(); // {price, change24h, fetchedAt} or null
+  let priceRefreshInterval = null;
 
-  function pLoadData() {
-    const saved = localStorage.getItem(P_KEY);
-    if (saved) { try { pBudgetData = JSON.parse(saved); } catch {} }
-    pRenderCategories();
-    pRenderExpenseCategoryOptions();
-    pRenderActualCategoryOptions();
-    pRenderBudgetOverview();
+  /* ── DOM refs ── */
+  const modeToggle      = document.getElementById("mode-toggle");
+  const modeLabel       = document.getElementById("mode-label");
+  const btcPanel        = document.getElementById("btc-panel");
+  const btcBtn          = document.getElementById("btc-btn");
+  const btcStatusBadge  = document.getElementById("btc-status-badge");
+  const btcPriceEl      = document.getElementById("btc-price");
+  const btcPriceChange  = document.getElementById("btc-price-change");
+  const btcRefreshBtn   = document.getElementById("btc-refresh");
+  const btcWalletsList  = document.getElementById("btc-wallets-list");
+  const btcTotalBtc     = document.getElementById("btc-total-btc");
+  const btcTotalUsd     = document.getElementById("btc-total-usd");
+  const btcLastUpdated  = document.getElementById("btc-last-updated");
+
+  /* ── Mode toggle ── */
+  modeToggle.addEventListener("click", () => {
+    isOnline = !isOnline;
+    applyMode();
+    if (isOnline && btcPanel.classList.contains("open")) {
+      fetchBtcPrice();
+    }
+  });
+
+  function applyMode() {
+    modeToggle.classList.toggle("online",  isOnline);
+    modeToggle.classList.toggle("offline", !isOnline);
+    modeLabel.textContent = isOnline ? "Online" : "Offline";
+    // Update badge if panel is visible
+    updateBadge();
+    // Start/stop auto-refresh
+    if (isOnline) {
+      if (!priceRefreshInterval) {
+        priceRefreshInterval = setInterval(() => {
+          if (isOnline) fetchBtcPrice();
+        }, 60000); // refresh every 60s when online
+      }
+    } else {
+      clearInterval(priceRefreshInterval);
+      priceRefreshInterval = null;
+      updateBadge();
+    }
   }
 
-  function pSaveData() { localStorage.setItem(P_KEY, JSON.stringify(pBudgetData)); }
+  function updateBadge() {
+    if (!isOnline) {
+      btcStatusBadge.textContent = "Offline";
+      btcStatusBadge.className   = "offline";
+    } else if (btcPriceData) {
+      btcStatusBadge.textContent = "Live";
+      btcStatusBadge.className   = "live";
+    } else {
+      btcStatusBadge.textContent = "Fetching…";
+      btcStatusBadge.className   = "cached";
+    }
+  }
 
-  function pInitializeBudget() {
+  /* ── Bitcoin panel toggle ── */
+  btcBtn.addEventListener("click", () => {
+    const open = btcPanel.classList.toggle("open");
+    btcBtn.textContent = open ? "₿ Hide Bitcoin" : "₿ Bitcoin";
+    if (open && isOnline && !btcPriceData) fetchBtcPrice();
+    if (open) renderBtcPanel();
+  });
+
+  /* ── Refresh button ── */
+  btcRefreshBtn.addEventListener("click", () => {
+    if (!isOnline) {
+      showBtcToast("Switch to Online mode to refresh the price.");
+      return;
+    }
+    fetchBtcPrice();
+  });
+
+  /* ── Fetch price ── */
+  async function fetchBtcPrice() {
+    btcStatusBadge.textContent = "Fetching…";
+    btcStatusBadge.className   = "cached";
+    try {
+      const res  = await fetch(BTC_API);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      btcPriceData = {
+        price:     json.bitcoin.usd,
+        change24h: json.bitcoin.usd_24h_change,
+        fetchedAt: new Date().toISOString()
+      };
+      saveBtcPrice();
+      btcStatusBadge.textContent = "Live";
+      btcStatusBadge.className   = "live";
+      renderBtcPanel();
+    } catch (err) {
+      btcStatusBadge.textContent = btcPriceData ? "Cached" : "No data";
+      btcStatusBadge.className   = "cached";
+      renderBtcPanel();
+    }
+  }
+
+  /* ── Render panel ── */
+  function renderBtcPanel() {
+    // Price row
+    if (btcPriceData) {
+      btcPriceEl.textContent = "$" + Number(btcPriceData.price).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+      const ch = btcPriceData.change24h;
+      if (ch !== undefined && ch !== null) {
+        btcPriceChange.textContent = (ch>=0?"+":"") + ch.toFixed(2) + "% 24h";
+        btcPriceChange.className   = ch>=0 ? "up" : "down";
+      }
+      // last updated
+      const d = new Date(btcPriceData.fetchedAt);
+      btcLastUpdated.textContent = d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});
+    } else {
+      btcPriceEl.textContent   = isOnline ? "Fetching…" : "Price unavailable (Offline)";
+      btcPriceChange.textContent = "";
+      btcLastUpdated.textContent = "—";
+    }
+
+    // Wallet list
+    btcWalletsList.innerHTML = "";
+    if (btcWallets.length === 0) {
+      btcWalletsList.innerHTML = `<p style="font-size:12px;color:#bbb;text-align:center;padding:8px 0">No wallets yet — add one above.</p>`;
+    } else {
+      btcWallets.forEach((w, idx) => {
+        const usdVal = btcPriceData ? (w.btc * btcPriceData.price) : null;
+        const row = document.createElement("div");
+        row.className = "btc-wallet-row";
+        row.innerHTML = `
+          <div class="btc-wallet-icon">&#x20BF;</div>
+          <div class="btc-wallet-info">
+            <div class="btc-wallet-name">${escHtml(w.name)}</div>
+            <div class="btc-wallet-btc">${formatBtc(w.btc)} BTC</div>
+          </div>
+          <div class="btc-wallet-usd">${usdVal!==null ? "$"+Number(usdVal.toFixed(2)).toLocaleString() : "—"}</div>
+          <button class="btc-wallet-del" data-idx="${idx}" title="Remove wallet">&#x2715;</button>`;
+        btcWalletsList.appendChild(row);
+      });
+      btcWalletsList.querySelectorAll(".btc-wallet-del").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const i = +e.currentTarget.dataset.idx;
+          if (confirm(`Remove wallet "${btcWallets[i].name}"?`)) {
+            btcWallets.splice(i, 1);
+            saveBtcWallets();
+            renderBtcPanel();
+          }
+        });
+      });
+    }
+
+    // Totals
+    const totalBtc = btcWallets.reduce((s, w) => s + w.btc, 0);
+    btcTotalBtc.textContent = formatBtc(totalBtc) + " ₿";
+    if (btcPriceData) {
+      const totalUsd = totalBtc * btcPriceData.price;
+      btcTotalUsd.textContent = "$" + Number(totalUsd.toFixed(2)).toLocaleString();
+    } else {
+      btcTotalUsd.textContent = "—";
+    }
+  }
+
+  /* ── Add wallet ── */
+  function btcAddWallet() {
+    const nameEl   = document.getElementById("btc-wallet-name");
+    const amountEl = document.getElementById("btc-wallet-amount");
+    const name     = nameEl.value.trim();
+    const btc      = parseFloat(amountEl.value);
+
+    if (!name) { showBtcToast("Please enter a wallet label."); return; }
+    if (isNaN(btc) || btc < 0) { showBtcToast("Please enter a valid BTC amount."); return; }
+
+    btcWallets.push({ name, btc: parseFloat(btc.toFixed(8)) });
+    saveBtcWallets();
+    nameEl.value   = "";
+    amountEl.value = "";
+    renderBtcPanel();
+  }
+
+  /* ── Helpers ── */
+  function formatBtc(n) {
+    // Always 8 decimal places (satoshi precision)
+    return Number(n).toFixed(8);
+  }
+  function escHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function showBtcToast(msg) {
+    const t = document.getElementById("share-toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add("visible");
+    setTimeout(() => t.classList.remove("visible"), 3500);
+  }
+
+  /* ── Storage ── */
+  function saveBtcWallets() { localStorage.setItem(BTC_WALLETS_KEY, JSON.stringify(btcWallets)); }
+  function loadBtcWallets() {
+    try { const r = localStorage.getItem(BTC_WALLETS_KEY); return r ? JSON.parse(r) : []; }
+    catch { return []; }
+  }
+  function saveBtcPrice() { localStorage.setItem(BTC_PRICE_KEY, JSON.stringify(btcPriceData)); }
+  function loadBtcPrice() {
+    try { const r = localStorage.getItem(BTC_PRICE_KEY); return r ? JSON.parse(r) : null; }
+    catch { return null; }
+  }
+
+  /* ── Init ── */
+  // Show cached price info immediately on load
+  renderBtcPanel();
+  applyMode();
+
+  // Expose btcAddWallet globally for onclick
+  window.btcAddWallet = btcAddWallet;
+</script>
+
+<!-- ══════════════════════════════════════════
+     PLANNER SCRIPT
+══════════════════════════════════════════ -->
+<script>
+  const P_KEY = "budgetAppData";
+  let pBudgetData = {
+    startYear:2026, numMonths:12, defaultIncome:5000,
+    incomeFrequency:"monthly", months:[], categories:[]
+  };
+
+  function pLoadData(){
+    const s = localStorage.getItem(P_KEY);
+    if(s){ try{ pBudgetData=JSON.parse(s); }catch{} }
+    pRenderCategories(); pRenderExpenseCategoryOptions(); pRenderActualCategoryOptions(); pRenderBudgetOverview();
+  }
+  function pSaveData(){ localStorage.setItem(P_KEY,JSON.stringify(pBudgetData)); }
+
+  function pInitializeBudget(){
     pBudgetData.startYear       = parseInt(document.getElementById("p-startYear").value);
     pBudgetData.numMonths       = parseInt(document.getElementById("p-numMonths").value);
     pBudgetData.defaultIncome   = parseFloat(document.getElementById("p-defaultIncome").value);
     pBudgetData.incomeFrequency = document.getElementById("p-incomeFrequency").value;
-
     let mi = pBudgetData.defaultIncome;
-    if      (pBudgetData.incomeFrequency === "weekly")   mi *= 4.333;
-    else if (pBudgetData.incomeFrequency === "biweekly") mi *= 2.166;
-    else if (pBudgetData.incomeFrequency === "yearly")   mi /= 12;
-
-    pBudgetData.months = [];
-    for (let i = 1; i <= pBudgetData.numMonths; i++) {
-      pBudgetData.months.push({ month: i, projectedIncome: mi, expenses: {}, totalBudgeted: 0, totalActual: 0 });
-    }
-    pUpdateAllMonthsExpenses();
-    pSaveData();
-    pRenderBudgetOverview();
-    alert("Budget initialized!");
+    if(pBudgetData.incomeFrequency==="weekly")   mi*=4.333;
+    else if(pBudgetData.incomeFrequency==="biweekly") mi*=2.166;
+    else if(pBudgetData.incomeFrequency==="yearly")   mi/=12;
+    pBudgetData.months=[];
+    for(let i=1;i<=pBudgetData.numMonths;i++)
+      pBudgetData.months.push({month:i,projectedIncome:mi,expenses:{},totalBudgeted:0,totalActual:0});
+    pUpdateAllMonthsExpenses(); pSaveData(); pRenderBudgetOverview(); alert("Budget initialized!");
   }
 
-  function pUpdateIncomeRange() {
-    const start = parseInt(document.getElementById("p-incomeMonthStart").value);
-    const end   = parseInt(document.getElementById("p-incomeMonthEnd").value);
-    const ni    = parseFloat(document.getElementById("p-newIncome").value);
-    if (start > end || start < 1 || end > pBudgetData.numMonths) { alert("Invalid month range."); return; }
-    for (let i = start - 1; i < end; i++) pBudgetData.months[i].projectedIncome = ni;
+  function pUpdateIncomeRange(){
+    const s=parseInt(document.getElementById("p-incomeMonthStart").value);
+    const e=parseInt(document.getElementById("p-incomeMonthEnd").value);
+    const v=parseFloat(document.getElementById("p-newIncome").value);
+    if(s>e||s<1||e>pBudgetData.numMonths){alert("Invalid month range.");return;}
+    for(let i=s-1;i<e;i++) pBudgetData.months[i].projectedIncome=v;
     pSaveData(); pRenderBudgetOverview(); alert("Income updated!");
   }
 
-  function pAddCategory() {
-    const name   = document.getElementById("p-categoryName").value.trim();
-    const budget = parseFloat(document.getElementById("p-categoryBudget").value) || 0;
-    if (!name) { alert("Category name required."); return; }
-    pBudgetData.categories.push({ name, defaultBudget: budget });
-    pUpdateAllMonthsExpenses();
-    pRenderCategories();
-    pRenderExpenseCategoryOptions();
-    pRenderActualCategoryOptions();
-    pSaveData();
+  function pAddCategory(){
+    const name  =document.getElementById("p-categoryName").value.trim();
+    const budget=parseFloat(document.getElementById("p-categoryBudget").value)||0;
+    if(!name){alert("Category name required.");return;}
+    pBudgetData.categories.push({name,defaultBudget:budget});
+    pUpdateAllMonthsExpenses(); pRenderCategories(); pRenderExpenseCategoryOptions(); pRenderActualCategoryOptions(); pSaveData();
   }
 
-  function pUpdateExpenseRange() {
-    const category = document.getElementById("p-expenseCategory").value;
-    const start    = parseInt(document.getElementById("p-expenseMonthStart").value);
-    const end      = parseInt(document.getElementById("p-expenseMonthEnd").value);
-    const ne       = parseFloat(document.getElementById("p-newExpense").value);
-    if (start > end || start < 1 || end > pBudgetData.numMonths) { alert("Invalid month range."); return; }
-    for (let i = start - 1; i < end; i++) {
-      if (!pBudgetData.months[i].expenses[category]) pBudgetData.months[i].expenses[category] = { budget: 0, actual: 0 };
-      pBudgetData.months[i].expenses[category].budget = ne;
+  function pUpdateExpenseRange(){
+    const cat=document.getElementById("p-expenseCategory").value;
+    const s=parseInt(document.getElementById("p-expenseMonthStart").value);
+    const e=parseInt(document.getElementById("p-expenseMonthEnd").value);
+    const v=parseFloat(document.getElementById("p-newExpense").value);
+    if(s>e||s<1||e>pBudgetData.numMonths){alert("Invalid month range.");return;}
+    for(let i=s-1;i<e;i++){
+      if(!pBudgetData.months[i].expenses[cat]) pBudgetData.months[i].expenses[cat]={budget:0,actual:0};
+      pBudgetData.months[i].expenses[cat].budget=v;
       pUpdateMonthTotals(i);
     }
     pSaveData(); pRenderBudgetOverview(); alert("Expenses updated!");
   }
 
-  function pAddActualExpense() {
-    const category = document.getElementById("p-actualCategory").value;
-    const month    = parseInt(document.getElementById("p-actualMonth").value) - 1;
-    const amount   = parseFloat(document.getElementById("p-actualAmount").value);
-    if (month < 0 || month >= pBudgetData.numMonths) { alert("Invalid month."); return; }
-    if (!pBudgetData.months[month].expenses[category]) pBudgetData.months[month].expenses[category] = { budget: 0, actual: 0 };
-    pBudgetData.months[month].expenses[category].actual += amount;
-    pUpdateMonthTotals(month);
+  function pAddActualExpense(){
+    const cat=document.getElementById("p-actualCategory").value;
+    const m=parseInt(document.getElementById("p-actualMonth").value)-1;
+    const v=parseFloat(document.getElementById("p-actualAmount").value);
+    if(m<0||m>=pBudgetData.numMonths){alert("Invalid month.");return;}
+    if(!pBudgetData.months[m].expenses[cat]) pBudgetData.months[m].expenses[cat]={budget:0,actual:0};
+    pBudgetData.months[m].expenses[cat].actual+=v;
+    pUpdateMonthTotals(m);
     pSaveData(); pRenderBudgetOverview(); alert("Actual expense added!");
   }
 
-  function pUpdateAllMonthsExpenses() {
-    pBudgetData.months.forEach((month, idx) => {
-      pBudgetData.categories.forEach(cat => {
-        if (!month.expenses[cat.name]) month.expenses[cat.name] = { budget: cat.defaultBudget, actual: 0 };
+  function pUpdateAllMonthsExpenses(){
+    pBudgetData.months.forEach((month,idx)=>{
+      pBudgetData.categories.forEach(cat=>{
+        if(!month.expenses[cat.name]) month.expenses[cat.name]={budget:cat.defaultBudget,actual:0};
       });
       pUpdateMonthTotals(idx);
     });
   }
-
-  function pUpdateMonthTotals(idx) {
-    const m = pBudgetData.months[idx];
-    m.totalBudgeted = Object.values(m.expenses).reduce((s, e) => s + (e.budget || 0), 0);
-    m.totalActual   = Object.values(m.expenses).reduce((s, e) => s + (e.actual || 0), 0);
+  function pUpdateMonthTotals(idx){
+    const m=pBudgetData.months[idx];
+    m.totalBudgeted=Object.values(m.expenses).reduce((s,e)=>s+(e.budget||0),0);
+    m.totalActual  =Object.values(m.expenses).reduce((s,e)=>s+(e.actual||0),0);
   }
 
-  function pRenderCategories() {
-    const container = document.getElementById("p-categoriesList");
-    container.innerHTML = "";
-    const title = document.createElement("h3");
-    title.style.cssText = "font-size:13px;margin:10px 0 6px;color:#333";
-    title.textContent = "Categories:";
-    container.appendChild(title);
-
-    if (!pBudgetData.categories.length) {
-      const p = document.createElement("p");
-      p.style.cssText = "font-size:12px;color:#888";
-      p.textContent = "No categories yet. Add one above.";
-      container.appendChild(p); return;
+  function pRenderCategories(){
+    const c=document.getElementById("p-categoriesList");
+    c.innerHTML="";
+    const h=document.createElement("h3");
+    h.style.cssText="font-size:13px;margin:10px 0 6px;color:#333";
+    h.textContent="Categories:"; c.appendChild(h);
+    if(!pBudgetData.categories.length){
+      const p=document.createElement("p"); p.style.cssText="font-size:12px;color:#888";
+      p.textContent="No categories yet."; c.appendChild(p); return;
     }
-
-    const table = document.createElement("table");
-    table.innerHTML = `<thead><tr>
-      <th>Category</th>
-      <th style="text-align:right">Default Budget</th>
-      <th style="text-align:center">Actions</th>
-    </tr></thead><tbody></tbody>`;
-    const tbody = table.querySelector("tbody");
-
-    pBudgetData.categories.forEach((cat, idx) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${cat.name}</td>
-        <td style="text-align:right">$${Number(cat.defaultBudget || 0).toFixed(2)}</td>
+    const tbl=document.createElement("table");
+    tbl.innerHTML=`<thead><tr><th>Category</th><th style="text-align:right">Default Budget</th><th style="text-align:center">Actions</th></tr></thead><tbody></tbody>`;
+    const tbody=tbl.querySelector("tbody");
+    pBudgetData.categories.forEach((cat,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${cat.name}</td><td style="text-align:right">$${Number(cat.defaultBudget||0).toFixed(2)}</td>
         <td style="text-align:center">
-          <button class="pe-cat" data-i="${idx}" style="padding:4px 8px;font-size:11px;margin-right:4px">Edit</button>
-          <button class="pr-cat p-danger" data-i="${idx}" style="padding:4px 8px;font-size:11px">Remove</button>
+          <button class="pe-cat" data-i="${i}" style="padding:4px 8px;font-size:11px;margin-right:4px">Edit</button>
+          <button class="pr-cat p-danger" data-i="${i}" style="padding:4px 8px;font-size:11px">Remove</button>
         </td>`;
       tbody.appendChild(tr);
     });
-    container.appendChild(table);
-
-    container.querySelectorAll(".pr-cat").forEach(btn => btn.addEventListener("click", e => {
-      const i = +e.currentTarget.dataset.i;
-      if (!confirm(`Remove "${pBudgetData.categories[i].name}"?`)) return;
-      pBudgetData.categories.splice(i, 1);
+    c.appendChild(tbl);
+    c.querySelectorAll(".pr-cat").forEach(btn=>btn.addEventListener("click",e=>{
+      const i=+e.currentTarget.dataset.i;
+      if(!confirm(`Remove "${pBudgetData.categories[i].name}"?`)) return;
+      pBudgetData.categories.splice(i,1);
       pUpdateAllMonthsExpenses(); pSaveData();
       pRenderCategories(); pRenderExpenseCategoryOptions(); pRenderActualCategoryOptions(); pRenderBudgetOverview();
     }));
-
-    container.querySelectorAll(".pe-cat").forEach(btn => btn.addEventListener("click", e => {
-      const i = +e.currentTarget.dataset.i;
-      const cat = pBudgetData.categories[i];
-      const newName = prompt("Category name:", cat.name); if (newName === null) return;
-      const newBudget = parseFloat(prompt("Default budget:", String(cat.defaultBudget || 0)) || "0") || 0;
-      const oldName = cat.name;
-      cat.name = newName.trim() || oldName;
-      cat.defaultBudget = newBudget;
-      if (oldName !== cat.name) {
-        pBudgetData.months.forEach(month => {
-          if (month.expenses[oldName]) {
-            month.expenses[cat.name] = month.expenses[oldName];
-            delete month.expenses[oldName];
-          } else if (!month.expenses[cat.name]) {
-            month.expenses[cat.name] = { budget: newBudget, actual: 0 };
-          }
+    c.querySelectorAll(".pe-cat").forEach(btn=>btn.addEventListener("click",e=>{
+      const i=+e.currentTarget.dataset.i;
+      const cat=pBudgetData.categories[i];
+      const nn=prompt("Category name:",cat.name); if(nn===null) return;
+      const nb=parseFloat(prompt("Default budget:",String(cat.defaultBudget||0))||"0")||0;
+      const old=cat.name;
+      cat.name=nn.trim()||old; cat.defaultBudget=nb;
+      if(old!==cat.name){
+        pBudgetData.months.forEach(month=>{
+          if(month.expenses[old]){month.expenses[cat.name]=month.expenses[old];delete month.expenses[old];}
+          else if(!month.expenses[cat.name]) month.expenses[cat.name]={budget:nb,actual:0};
         });
       } else {
-        pBudgetData.months.forEach(month => {
-          if (!month.expenses[cat.name]) month.expenses[cat.name] = { budget: newBudget, actual: 0 };
-          else month.expenses[cat.name].budget = newBudget;
+        pBudgetData.months.forEach(month=>{
+          if(!month.expenses[cat.name]) month.expenses[cat.name]={budget:nb,actual:0};
+          else month.expenses[cat.name].budget=nb;
         });
       }
       pUpdateAllMonthsExpenses(); pSaveData();
@@ -835,97 +1091,71 @@
     }));
   }
 
-  function pRenderExpenseCategoryOptions() {
-    const sel = document.getElementById("p-expenseCategory");
-    sel.innerHTML = "";
-    pBudgetData.categories.forEach(cat => {
-      const o = document.createElement("option"); o.value = o.textContent = cat.name; sel.appendChild(o);
-    });
+  function pRenderExpenseCategoryOptions(){
+    const s=document.getElementById("p-expenseCategory"); s.innerHTML="";
+    pBudgetData.categories.forEach(c=>{const o=document.createElement("option");o.value=o.textContent=c.name;s.appendChild(o);});
+  }
+  function pRenderActualCategoryOptions(){
+    const s=document.getElementById("p-actualCategory"); s.innerHTML="";
+    pBudgetData.categories.forEach(c=>{const o=document.createElement("option");o.value=o.textContent=c.name;s.appendChild(o);});
   }
 
-  function pRenderActualCategoryOptions() {
-    const sel = document.getElementById("p-actualCategory");
-    sel.innerHTML = "";
-    pBudgetData.categories.forEach(cat => {
-      const o = document.createElement("option"); o.value = o.textContent = cat.name; sel.appendChild(o);
-    });
-  }
-
-  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-  function pRenderBudgetOverview() {
-    const overview = document.getElementById("p-budgetOverview");
-    overview.innerHTML = "";
-    pBudgetData.months.forEach(month => {
-      const year  = pBudgetData.startYear + Math.floor((month.month - 1) / 12);
-      const mName = MONTH_NAMES[(month.month - 1) % 12];
-      const card  = document.createElement("div");
-      card.className = "p-month-card";
-
-      const surplus = month.projectedIncome - month.totalBudgeted;
-      const balance = month.projectedIncome - month.totalActual;
-
-      card.innerHTML = `
-        <h3>${mName} ${year} <small style="font-weight:400;color:#888">(Mo. ${month.month})</small></h3>
+  const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function pRenderBudgetOverview(){
+    const ov=document.getElementById("p-budgetOverview"); ov.innerHTML="";
+    pBudgetData.months.forEach(month=>{
+      const yr=pBudgetData.startYear+Math.floor((month.month-1)/12);
+      const mn=MN[(month.month-1)%12];
+      const card=document.createElement("div"); card.className="p-month-card";
+      const sur=month.projectedIncome-month.totalBudgeted;
+      const bal=month.projectedIncome-month.totalActual;
+      card.innerHTML=`
+        <h3>${mn} ${yr} <small style="font-weight:400;color:#888">(Mo. ${month.month})</small></h3>
         <p>Projected Income: <strong>$${month.projectedIncome.toFixed(2)}</strong></p>
         <p>Total Budgeted: <strong>$${month.totalBudgeted.toFixed(2)}</strong></p>
         <p>Total Actual: <strong>$${month.totalActual.toFixed(2)}</strong></p>
-        <p style="color:${surplus >= 0 ? "#2a7a50" : "#c0392b"}">Surplus/Deficit: <strong>$${surplus.toFixed(2)}</strong></p>
-        <p style="color:${balance >= 0 ? "#2a6db5" : "#c0392b"}">Actual Balance: <strong>$${balance.toFixed(2)}</strong></p>`;
-
-      const table = document.createElement("table");
-      table.innerHTML = `<thead><tr>
-        <th>Category</th>
-        <th style="text-align:right">Budget</th>
-        <th style="text-align:right">Actual</th>
-        <th style="text-align:right">Variance</th>
-      </tr></thead>`;
-      const tbody = document.createElement("tbody");
-      const cats = Object.keys(month.expenses).sort((a, b) => a.localeCompare(b));
-
-      if (!cats.length) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#999">No categories</td></tr>`;
+        <p style="color:${sur>=0?"#2a7a50":"#c0392b"}">Surplus/Deficit: <strong>$${sur.toFixed(2)}</strong></p>
+        <p style="color:${bal>=0?"#2a6db5":"#c0392b"}">Actual Balance: <strong>$${bal.toFixed(2)}</strong></p>`;
+      const tbl=document.createElement("table");
+      tbl.innerHTML=`<thead><tr><th>Category</th><th style="text-align:right">Budget</th><th style="text-align:right">Actual</th><th style="text-align:right">Variance</th></tr></thead>`;
+      const tbody=document.createElement("tbody");
+      const cats=Object.keys(month.expenses).sort((a,b)=>a.localeCompare(b));
+      if(!cats.length){
+        tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:#999">No categories</td></tr>`;
       } else {
-        cats.forEach(cat => {
-          const exp      = month.expenses[cat] || { budget: 0, actual: 0 };
-          const variance = exp.budget - exp.actual;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${cat}</td>
-            <td style="text-align:right">$${Number(exp.budget || 0).toFixed(2)}</td>
-            <td style="text-align:right">$${Number(exp.actual || 0).toFixed(2)}</td>
-            <td style="text-align:right;color:${variance >= 0 ? "#2a7a50" : "#c0392b"}">$${Number(variance).toFixed(2)}</td>`;
+        cats.forEach(cat=>{
+          const ex=month.expenses[cat]||{budget:0,actual:0};
+          const va=ex.budget-ex.actual;
+          const tr=document.createElement("tr");
+          tr.innerHTML=`<td>${cat}</td>
+            <td style="text-align:right">$${Number(ex.budget||0).toFixed(2)}</td>
+            <td style="text-align:right">$${Number(ex.actual||0).toFixed(2)}</td>
+            <td style="text-align:right;color:${va>=0?"#2a7a50":"#c0392b"}">$${Number(va).toFixed(2)}</td>`;
           tbody.appendChild(tr);
         });
       }
-      table.appendChild(tbody);
-      card.appendChild(table);
-      overview.appendChild(card);
+      tbl.appendChild(tbody); card.appendChild(tbl); ov.appendChild(card);
     });
   }
 
-  function pExportData() {
-    const blob = new Blob([JSON.stringify(pBudgetData, null, 2)], { type: "application/json" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href = url; a.download = "budget-plan.json"; a.click();
+  function pExportData(){
+    const blob=new Blob([JSON.stringify(pBudgetData,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download="budget-plan.json"; a.click();
     URL.revokeObjectURL(url);
   }
-
-  function pImportData() {
-    const file = document.getElementById("p-importFile").files[0];
-    if (!file) { alert("No file selected."); return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        pBudgetData = JSON.parse(e.target.result);
-        pSaveData();
-        pRenderCategories(); pRenderExpenseCategoryOptions();
-        pRenderActualCategoryOptions(); pRenderBudgetOverview();
+  function pImportData(){
+    const f=document.getElementById("p-importFile").files[0];
+    if(!f){alert("No file selected.");return;}
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        pBudgetData=JSON.parse(e.target.result); pSaveData();
+        pRenderCategories(); pRenderExpenseCategoryOptions(); pRenderActualCategoryOptions(); pRenderBudgetOverview();
         alert("Data imported!");
-      } catch { alert("Invalid JSON file."); }
+      } catch{ alert("Invalid JSON file."); }
     };
-    reader.readAsText(file);
+    r.readAsText(f);
   }
 
   window.addEventListener("load", pLoadData);
