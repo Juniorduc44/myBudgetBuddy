@@ -1,4 +1,4 @@
-# 💰 My Budget Buddy
+# 💰 Budget Buddy
 
 A fully self-contained, offline-capable personal finance tracker with Bitcoin wallet support and a comprehensive multi-month budget planner — all in a **single HTML file**. No installation, no server, no dependencies to manage. Just open it in a browser.
 
@@ -140,7 +140,7 @@ All data is stored in your browser's `localStorage` under these keys:
     "fetchedAt": "2026-02-25T23:25:42.933Z"
   },
   "exportedAt": "2026-02-25T23:41:37.857Z",
-  "version": "0.3.1"
+  "version": "2.1.0"
 }
 ```
 
@@ -162,11 +162,23 @@ All loaded via CDN — the app requires an internet connection only for these on
 
 ## Known Limitations
 
-- **Android file picker** — importing files works best from the `Downloads` folder. Files in nested subdirectories may fail to read in some Android browsers due to `content://` URI restrictions. See v0.3.2 release notes.
+- **Android file picker** — importing files works best from the `Downloads` folder. Files in nested subdirectories may fail to read in some Android browsers due to `content://` URI restrictions. See v2.1.1 release notes.
 - **localStorage limits** — browsers typically cap `localStorage` at 5–10 MB. For typical personal finance use this is not a concern.
 - **No sync** — data lives only in the browser it was saved in. Use Export/Import to move data between devices or browsers.
 - **BTC price only** — the Bitcoin panel currently supports BTC/USD only. Other cryptocurrencies are not supported.
 - **No currency selection** — all fiat amounts are displayed in USD ($).
+
+---
+
+## Changelog
+
+| Version | Description |
+|---|---|
+| **v2.1.1** | Android mobile import fix — `display:none` → visually hidden input, explicit UTF-8 encoding, loosened `accept` MIME types, hardened `FileReader` error handling |
+| **v2.1.0** | Unified export/import — transactions + BTC wallets + price cache bundled into one JSON file |
+| **v2.0.0** | Bitcoin integration — wallet panel, online/offline toggle, live CoinGecko price feed, 8dp precision |
+| **v1.0** | Embedded Budget Planner — full multi-month planning modal with category CRUD and actual spend tracking |
+| *(pre-git)* | Initial release — merged `app.js`, `index.html`, `style.css` into single self-contained HTML file |
 
 ---
 
