@@ -1,5 +1,7 @@
 # 💰 Budget Buddy
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A fully self-contained, offline-capable personal finance tracker with Bitcoin wallet support and a comprehensive multi-month budget planner — all in a **single HTML file**. No installation, no server, no dependencies to manage. Just open it in a browser.
 
 ---
@@ -108,6 +110,7 @@ All data is stored in your browser's `localStorage` under these keys:
 | `myBudgetBuddy.transactions.v1` | Transaction list |
 | `myBudgetBuddy.btcWallets.v1` | Bitcoin wallet list |
 | `myBudgetBuddy.btcPrice.v1` | Cached BTC price + timestamp |
+| `myBudgetBuddy.customCategories.v1` | User-defined transaction categories |
 | `budgetAppData` | Planner budget configuration |
 
 > **Note:** `localStorage` is browser and origin-specific. Data saved in Brave won't appear in Firefox, and data from a file opened from `Downloads/` is separate from one opened from `Documents/`.
@@ -172,13 +175,29 @@ All loaded via CDN — the app requires an internet connection only for these on
 
 ## Changelog
 
+<details>
+<summary>View version history</summary>
+
 | Version | Description |
 |---|---|
+| **v2.2.0** | Custom transaction categories — add user-defined categories from the transaction sheet, persisted to localStorage |
 | **v2.1.1** | Android mobile import fix — `display:none` → visually hidden input, explicit UTF-8 encoding, loosened `accept` MIME types, hardened `FileReader` error handling |
 | **v2.1.0** | Unified export/import — transactions + BTC wallets + price cache bundled into one JSON file |
 | **v2.0.0** | Bitcoin integration — wallet panel, online/offline toggle, live CoinGecko price feed, 8dp precision |
 | **v1.0** | Embedded Budget Planner — full multi-month planning modal with category CRUD and actual spend tracking |
 | *(pre-git)* | Initial release — merged `app.js`, `index.html`, `style.css` into single self-contained HTML file |
+
+</details>
+
+---
+
+## License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for full details.
+
+Copyright (c) 2026 Junior Ducatel
+
+In short: you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of this software. The only requirement is that the original copyright notice and license text are included in any copy or substantial portion of the software.
 
 ---
 
